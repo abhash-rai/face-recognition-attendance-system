@@ -1,0 +1,2 @@
+1. Create basic attendance script in python
+2. which can read and write attendance information to a database (csv)
