@@ -1,1 +1,1 @@
-batch, student_id, student_name, datetime, attendance
+student_id, datetime, attendance
