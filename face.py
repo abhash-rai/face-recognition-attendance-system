@@ -17,10 +17,12 @@ def image_encoder(image: np.ndarray) -> np.ndarray:
 
 def encode_multiple_images(images: list) -> list:
     '''
-    Encodes a given list of np.ndarray image encoding into a list of same length list of 128-dimension np.ndarray face encoding for each element in the given list
+    Encodes a given list of np.ndarray image representation into a list of same length list of 128-dimension np.ndarray face encoding for each element in the given list
     Input -> (images) List of 1 Dimensional numpy array representation of images
     Return -> list of face encodings
     '''
+    encoded_images_list = []
+    for image in images:
 
 def compare_with_database_encoding(database_encodings: list, unknown_face_encoding: np.ndarray):
     '''
