@@ -1,6 +1,22 @@
 import numpy as np
 import face_recognition
 
+def image_path_to_numpy_array(image_paths: list) -> np.ndarray:
+    '''
+    Converts given 'image_paths' to a list of numpy array representation of those image paths
+    Return -> list (of np.ndarray)
+    '''
+
+    # Initialized an empty list to store list of known face encodings
+    known_image_encodings=[]
+
+    # Converting and then adding encodings of each image in the intialized list
+    for image in image_paths:
+        image=face_recognition.load_image_file(image)
+        known_image_encodings.append(image)
+
+    return known_image_encodings
+
 def image_encoder(image: np.ndarray) -> list:
     '''
     Encodes only the face portions of a single given image into 128-dimension face encoding
@@ -10,16 +26,6 @@ def image_encoder(image: np.ndarray) -> list:
               else, return list of multiple face encodings
     '''
     return face_recognition.api.face_encodings(image)
-
-def image_encoder(image: np.ndarray) -> np.ndarray:
-    '''
-    Encodes only the face portion of a single given image into 128-dimension face encoding
-    Input -> (image) 1 Dimensional numpy array representation of an image
-    Return -> Face encoding (NumPy array)
-    '''
-    top, right, bottom, left = face_recognition.api.face_locations(image)
-    face_only = image[top:bottom, left:right]
-    return face_recognition.face_encodings(face_only)
 
 def encode_multiple_images(images: list) -> list:
     '''
