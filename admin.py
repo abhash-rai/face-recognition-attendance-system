@@ -7,8 +7,7 @@ class Admin:
         pass
 
     def image_to_encoding(self, image):
-        face=face_recognition.load_image_file(image)
-        encoding= face_recognition.face_encodings(face)[0]
+        encoding= face_recognition.face_encodings(image)[0]
         return encoding
     
 
@@ -18,5 +17,17 @@ class Admin:
             
         elif method == 'img':
             pass
+            
+
+    def make_entry_from_image(self,student_id: int, student_name:str, batch:str,path):
+        face=face_recognition.load_image_file(path)
+        image_encoding = self.image_to_encoding(face)
+
+
+
+
+
+    
+            
             
     
