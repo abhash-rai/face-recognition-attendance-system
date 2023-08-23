@@ -1,11 +1,23 @@
 import face_recognition
 import cv2
 import numpy as np
+import pandas as pd
 
 class Admin:
 
     def __init__(self):
-        pass
+        self.__db_path = './database/students.csv'
+
+    def add_entry_to_db(self, encoding, student_id: int, student_name:str, batch:str):
+        new_entry = {
+            'encoding': encoding,
+            'student_id': student_id,
+            'student_name': student_name,
+            'batch': batch
+        }
+        df = pd.read_csv(self.__db_path)
+        df.loc[len(df)] = new_entry
+        df.to_csv(self.__db_path, index=False)
 
     def image_to_encoding(self, image):
         encoding= face_recognition.face_encodings(image)[0]
