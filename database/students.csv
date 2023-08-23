@@ -1,1 +1,1 @@
-encoding, student_id, student_name, semester, course, university
+encoding, student_id, first_name, middle_name, last_name, semester, course, university
