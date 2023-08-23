@@ -21,8 +21,7 @@ def encode_multiple_images(images: list) -> list:
     Input -> (images) List of 1 Dimensional numpy array representation of images
     Return -> list of face encodings
     '''
-    encoded_images_list = []
-    for image in images:
+    return [ image_encoder(image) for image in images]
 
 def compare_with_database_encoding(database_encodings: list, unknown_face_encoding: np.ndarray):
     '''
