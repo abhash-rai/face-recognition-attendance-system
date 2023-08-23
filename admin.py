@@ -9,18 +9,15 @@ class Admin:
         self.__db_path = './database/students.csv'
 
     def add_entry_to_db(self, encoding, student_id: int, student_name:str, batch:str):
-        new_entry = {
-            'encoding': encoding,
-            'student_id': student_id,
-            'student_name': student_name,
-            'batch': batch
-        }
+        encoding = str(list(encoding))
         df = pd.read_csv(self.__db_path)
-        df.loc[len(df)] = new_entry
+        print(df)
+        df.loc[len(df)] = [encoding, student_id, student_name, batch]
+        print(df)
         df.to_csv(self.__db_path, index=False)
 
     def image_to_encoding(self, image):
-        encoding= face_recognition.face_encodings(image)[0]
+        encoding= face_recognition.face_encodings(image)
         return encoding
     
     def capture_frame(cam_index=0):
@@ -46,12 +43,9 @@ class Admin:
     def make_entry_from_image(self,student_id: int, student_name:str, batch:str,path):
         face=face_recognition.load_image_file(path)
         image_encoding = self.image_to_encoding(face)[0]
+        self.add_entry_to_db(image_encoding, student_id, student_name, batch)
 
+a = Admin()
 
-
-
-
-    
-            
-            
+b = a.make_entry_from_cam(1,'Abhash', 'BCU',)
     
