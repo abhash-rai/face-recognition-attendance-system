@@ -1,6 +1,7 @@
 import numpy as np
 import face_recognition
 import os
+import cv2
 
 def image_path_to_numpy_array(image_paths: list) -> np.ndarray:
     '''
@@ -47,3 +48,15 @@ def main(paths):
     '''
     list_of_paths = [str(f"{paths}\{path}") for path in os.listdir(paths)]
     return image_path_to_numpy_array(list_of_paths)
+
+def capture_a_frame():
+    videoCaptureObject = cv2.VideoCapture(0)
+    result=True
+    while(result):
+        ret,frame=videoCaptureObject.read()
+        frame1=cv2.imwrite("newframe.jpg",frame)
+        result=False
+    videoCaptureObject.release()
+    cv2.destroyAllWindows()
+    return frame1
+    
