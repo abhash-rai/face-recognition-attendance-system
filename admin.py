@@ -39,12 +39,13 @@ class Admin:
 
     def make_entry_from_cam(self, student_id: int, student_name:str, batch:str, cam_index=0):
         captured = self.capture_frame
-        face_encoding = self.image_to_encoding(captured)
+        face_encoding = self.image_to_encoding(captured)[0]
+        self.add_entry_to_db(face_encoding, student_id, student_name, batch)
             
 
     def make_entry_from_image(self,student_id: int, student_name:str, batch:str,path):
         face=face_recognition.load_image_file(path)
-        image_encoding = self.image_to_encoding(face)
+        image_encoding = self.image_to_encoding(face)[0]
 
 
 
