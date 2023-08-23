@@ -1,11 +1,21 @@
 import numpy as np
+import face_recognition
 
 def image_path_to_numpy_array(image_paths: list) -> np.ndarray:
     '''
     Converts given 'image_paths' to a list of numpy array representation of those image paths
     Return -> list (of np.ndarray)
     '''
-    pass
+
+    # Initialized an empty list to store list of known face encodings
+    known_image_encodings=[]
+
+    # Converting and then adding encodings of each image in Intialized list
+    for image in image_paths:
+        image=face_recognition.load_image_file(image)
+        known_image_encodings.append(image)
+        
+    return known_image_encodings
 
 def image_encoder(image: np.ndarray) -> np.ndarray:
     '''
