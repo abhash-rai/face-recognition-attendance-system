@@ -1,5 +1,6 @@
 import numpy as np
 import face_recognition
+import os
 
 def image_path_to_numpy_array(image_paths: list) -> np.ndarray:
     '''
@@ -10,7 +11,7 @@ def image_path_to_numpy_array(image_paths: list) -> np.ndarray:
     # Initialized an empty list to store list of known face encodings
     known_image_encodings=[]
 
-    # Converting and then adding encodings of each image in Intialized list
+    # Converting and then adding encodings of each image in the intialized list
     for image in image_paths:
         image=face_recognition.load_image_file(image)
         known_image_encodings.append(image)
@@ -40,8 +41,9 @@ def compare_with_database_encoding(database_encodings: list, unknown_face_encodi
     '''
     pass
 
-def main():
+def main(paths):
     '''
     Main script to run
     '''
-    pass
+    list_of_paths = [str(f"{paths}\{path}") for path in os.listdir(paths)]
+    return image_path_to_numpy_array(list_of_paths)
