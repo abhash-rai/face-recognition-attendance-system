@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import pandas as pd
 import ast
-
+import sys
 # class Admin:
 
 #     def __init__(self):
@@ -59,7 +59,8 @@ class Admin:
 
     def __init__(self):
         self.__db_path = './database/students.csv'
-        self.__db_encoded_faces = [ np.array(ast.literal_eval(encoded_data)) for encoded_data in pd.read_csv(self.__db_path)['encoding'] ]
+        self.__student_db = pd.read_csv(self.__db_path)
+        self.__db_encoded_faces = [ np.array(ast.literal_eval(encoded_data)) for encoded_data in self.__student_db['encoding'] ]
         self.__process_current_frame = True
 
     def add_entry_to_db(self, encoding, student_id: int, first_name:str, middle_name:str, last_name:str, semester:int, course: str, university: str) -> None:
@@ -83,15 +84,79 @@ class Admin:
             return
         else:
             self.add_entry_to_db(image_encoding[0], student_id, first_name, middle_name, last_name, semester, course, university)
+    
+    def run_recognition(self, preview=False):
+
+        if preview == True:
+            video_capture =cv2.VideoCapture(0)
+
+            if not video_capture.isOpened():
+                sys.exit("video source not found")
+
+            while True:
+                ret, frame = video_capture.read()
+
+                if self.__process_current_frame:
+                    small_frame = cv2.resize(frame,(0,0), fx=0.5, fy=0.5) # Resized to 50 % of orignal height and width
+                    rgb_small_frame= small_frame[:,:,::-1]
+
+                    # find faces
+                    self.face_locations = face_recognition.face_locations(rgb_small_frame)
+                    self.face_encodings = face_recognition.face_encodings(rgb_small_frame,self.face_locations)
+
+                    self.students_id = []
+                    self.face_names=[]
+
+                    for face_encoding in self.face_encodings:
+                        matches = face_recognition.compare_faces(self.__db_encoded_faces, face_encoding)
+                        name ="unknown"
+                        confidence ="unknown"
+
+                        face_distances =face_recognition.face_distance(self.__db_encoded_faces, face_encoding)
+                        best_match_index = np.argmin(face_distances)
+
+                        if matches[best_match_index]:
+                            name = f"{self.__student_db.loc[best_match_index, 'first_name']} {self.__student_db.loc[best_match_index, 'last_name']}"
+                            confidence = 0
+                            # face_confidence(face_distances[best_match_index])
+                            self.face_names.append(f"{name} {confidence}")
+
+                            '''Add below code to update the attendence'''
+                            student_id = self.__student_db.loc[best_match_index, 'student_id']
+
+                self.__process_current_frame = not self.__process_current_frame
+
+                # display annotation
+
+                for(top,right,bottom,left), name in zip(self.face_locations,self.face_names):
+                    top *=4
+                    right *=4
+                    bottom *=4
+                    left *=4
+
+                    cv2.rectangle(frame,(left,top),(right,bottom),(0,0,255), 2)
+                    cv2.rectangle(frame,(left,bottom-35),(right,bottom),(0,0,255), -1)
+                    cv2.putText(frame, name, (left+6, bottom -6), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255,255,255), 1)
+
+                cv2.imshow("Face Recognition", frame)
+
+                if cv2.waitKey(1) == ord("q"):
+                    break
+
+            video_capture.release()
+            cv2.destroyAllWindows()
+        
+        else:
 
 admin = Admin()
-admin.make_entry_from_image(
-    student_id = 1,
-    first_name = 'Abhash', 
-    middle_name = '', 
-    last_name = 'Rai', 
-    semester = 3, 
-    course = 'Bsc (Hons) Computer and Data Science', 
-    university = 'BCU', 
-    path = './images/imgs/Sudeep.jpg'
-)
+# admin.make_entry_from_image(
+#     student_id = 1,
+#     first_name = 'Abhash', 
+#     middle_name = '', 
+#     last_name = 'Rai', 
+#     semester = 3, 
+#     course = 'Bsc (Hons) Computer and Data Science', 
+#     university = 'BCU', 
+#     path = './images/imgs/Sudeep.jpg'
+# )
+admin.run_recognition()
