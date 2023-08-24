@@ -154,26 +154,26 @@ admin = Admin()
 #     university = 'BCU', 
 #     path = r'images\abhash.jpg'
 # )
-admin.make_entry_from_image(
-    student_id = 2,
-    first_name = 'Sudeep', 
-    middle_name = '', 
-    last_name = 'Fullel', 
-    semester = 3, 
-    course = 'Bsc (Hons) Computer and Data Science', 
-    university = 'BCU', 
-    path = './images/sudeep.jpg'
-)
-admin.make_entry_from_image(
-    student_id = 3,
-    first_name = 'Sadikshya', 
-    middle_name = '', 
-    last_name = 'Ghimire', 
-    semester = 3, 
-    course = 'Bsc (Hons) Computer and Data Science', 
-    university = 'BCU', 
-    path = './images/sadik.jpg'
-)
+# admin.make_entry_from_image(
+#     student_id = 2,
+#     first_name = 'Sudeep', 
+#     middle_name = '', 
+#     last_name = 'Fullel', 
+#     semester = 3, 
+#     course = 'Bsc (Hons) Computer and Data Science', 
+#     university = 'BCU', 
+#     path = './images/sudeep.jpg'
+# )
+# admin.make_entry_from_image(
+#     student_id = 3,
+#     first_name = 'Sadikshya', 
+#     middle_name = '', 
+#     last_name = 'Ghimire', 
+#     semester = 3, 
+#     course = 'Bsc (Hons) Computer and Data Science', 
+#     university = 'BCU', 
+#     path = './images/sadik.jpg'
+# )
 # admin.make_entry_from_image(
 #     student_id = 1,
 #     first_name = '', 
