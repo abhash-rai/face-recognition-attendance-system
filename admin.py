@@ -62,6 +62,8 @@ class Admin:
         self.__student_db = pd.read_csv(self.__db_path)
         self.__db_encoded_faces = [ np.array(ast.literal_eval(encoded_data)) for encoded_data in self.__student_db['encoding'] ]
         self.__process_current_frame = True
+        self.__finding_face_location_model = 'hog' #'cnn' has better accuracy but uses GPU, 'hog' is faster with less accuracy uses cpu
+        self.__finding_face_encoding_model = 'small' #'large' model has better accuracy but is slower, 'small' model is faster
 
     def add_entry_to_db(self, encoding, student_id: int, first_name:str, middle_name:str, last_name:str, semester:int, course: str, university: str) -> None:
         encoding = str(list(encoding))
@@ -70,7 +72,7 @@ class Admin:
         df.to_csv(self.__db_path, index=False)
 
     def image_to_encoding(self, image):
-        encoding= face_recognition.face_encodings(image)
+        encoding= face_recognition.face_encodings(image, model = self.__finding_face_encoding_model)
         return encoding
 
     def make_entry_from_image(self, student_id: int, first_name:str, middle_name:str, last_name:str, semester:int, course: str, university: str, path:str):
@@ -101,8 +103,8 @@ class Admin:
                     rgb_small_frame= small_frame[:,:,::-1]
 
                     # find faces
-                    self.face_locations = face_recognition.face_locations(rgb_small_frame)
-                    self.face_encodings = face_recognition.face_encodings(rgb_small_frame,self.face_locations)
+                    self.face_locations = face_recognition.face_locations(rgb_small_frame, model=self.__finding_face_location_model)
+                    self.face_encodings = face_recognition.face_encodings(rgb_small_frame, self.face_locations, model=self.__finding_face_encoding_model)
 
                     self.students_id = []
                     self.face_names=[]
