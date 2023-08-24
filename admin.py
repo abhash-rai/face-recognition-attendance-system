@@ -109,25 +109,11 @@ class Admin:
 
                     for face_encoding in self.face_encodings:
                         matches = face_recognition.compare_faces(self.__db_encoded_faces, face_encoding)
-                        # print(matches)
-                        if True in matches:
-                            best_match_index = matches.index(True)
-                            self.face_names = [f"{self.__student_db.loc[best_match_index, 'first_name']} {self.__student_db.loc[best_match_index, 'last_name']}" if x is True else 'Unknown' for x in matches]
-                        else:
-                            self.face_names = ['Unknown' for _ in matches]
-
-                        # face_distances = face_recognition.face_distance(self.__db_encoded_faces, face_encoding)
-                        # best_match_index = np.argmin(face_distances)
-
-                        # if matches[best_match_index]:
-                        #     name = f"{self.__student_db.loc[best_match_index, 'first_name']} {self.__student_db.loc[best_match_index, 'last_name']}"
-                        #     # face_confidence(face_distances[best_match_index])
-                        #     self.face_names.append(f"{name}")
-
-                        #     '''Add below code to update the attendence'''
-                        #     student_id = self.__student_db.loc[best_match_index, 'student_id']
-                        # else:
-                        #     self.face_names.append(f"{name}")
+                        for n, con in enumerate(matches):
+                            if con == True:
+                                self.face_names.append(f"{self.__student_db.loc[n, 'first_name']} {self.__student_db.loc[n, 'last_name']}")
+                            else:
+                                self.face_names.append('unknown')
 
 
                 self.__process_current_frame = not self.__process_current_frame
