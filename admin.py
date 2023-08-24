@@ -110,19 +110,20 @@ class Admin:
                     for face_encoding in self.face_encodings:
                         matches = face_recognition.compare_faces(self.__db_encoded_faces, face_encoding)
                         name ="unknown"
-                        confidence ="unknown"
 
                         face_distances =face_recognition.face_distance(self.__db_encoded_faces, face_encoding)
                         best_match_index = np.argmin(face_distances)
 
                         if matches[best_match_index]:
                             name = f"{self.__student_db.loc[best_match_index, 'first_name']} {self.__student_db.loc[best_match_index, 'last_name']}"
-                            confidence = 0
                             # face_confidence(face_distances[best_match_index])
-                            self.face_names.append(f"{name} {confidence}")
+                            self.face_names.append(f"{name}")
 
                             '''Add below code to update the attendence'''
                             student_id = self.__student_db.loc[best_match_index, 'student_id']
+                        else:
+                            self.face_names.append(f"{name}")
+
 
                 self.__process_current_frame = not self.__process_current_frame
 
