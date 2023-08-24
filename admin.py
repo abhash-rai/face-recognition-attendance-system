@@ -97,7 +97,7 @@ class Admin:
                 ret, frame = video_capture.read()
 
                 if self.__process_current_frame:
-                    small_frame = cv2.resize(frame,(0,0), fx=0.5, fy=0.5) # Resized to 50 % of orignal height and width
+                    small_frame = cv2.resize(frame,(0,0), fx=0.25, fy=0.25) # Resized to 50 % of orignal height and width
                     rgb_small_frame= small_frame[:,:,::-1]
 
                     # find faces
@@ -147,6 +147,7 @@ class Admin:
             cv2.destroyAllWindows()
         
         else:
+            pass
 
 admin = Admin()
 # admin.make_entry_from_image(
@@ -159,4 +160,4 @@ admin = Admin()
 #     university = 'BCU', 
 #     path = './images/imgs/Sudeep.jpg'
 # )
-admin.run_recognition()
+admin.run_recognition(preview=True)
