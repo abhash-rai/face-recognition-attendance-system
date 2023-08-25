@@ -1,1 +1,2 @@
-student_id,first_name,middle_name,last_name,semester,course,university
+student_id,university,first_name,middle_name,last_name,semester,course
+23140736,BCU,Abhash,,Rai,3,'Bsc (Hons) Computer and Data Science'
