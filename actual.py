@@ -2,6 +2,9 @@ import face_recognition
 import cv2
 import numpy as np
 import os
+import json
+import socket
+import ast
 
 
 '''
@@ -19,13 +22,37 @@ Student Face Encodings should be returned to this script in a dictionary format.
 
 class Attendance:
 
-    def __init__(self, scale_frame=0.5, face_location_model='hog', face_encoding_model = 'small'):
+    def __init__(self, server_ip_address: str, server_port: int, scale_frame=0.5, face_location_model='hog', face_encoding_model = 'small'):
 
-        def retrieve_faces_encodings():
+        def retrieve_faces_encodings(server_ip_address, server_port, chunksize=1024):
             '''Retrieves and retuns dictionary (key is face enoding and value is the student id) of faces encoding from the server'''
-            return { tuple(np.load('./database/face_encodings/'+encoded_face_id)):encoded_face_id.split('.')[0] for encoded_face_id in os.listdir('./database/face_encodings/') }
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            server_address = (server_ip_address, server_port)  # the server's IP address and port
+            sock.connect(server_address)
 
-        self.__encodings_database = retrieve_faces_encodings()
+            # Receive JSON data
+            json_data = b""
+            while True:
+                chunk = sock.recv(chunksize)
+                if not chunk:
+                    break
+                json_data += chunk
+
+            # Decode and load the received JSON data
+            encodings_data = json.loads(json_data.decode())
+
+            while True:
+                chunk = sock.recv(chunksize)
+                if not chunk:
+                    break
+
+            print("JSON data received:", encodings_data)
+            sock.close()
+            data_base = {ast.literal_eval(key): val for key, val in encodings_data.items()}
+            return data_base
+
+        self.__encodings_database = retrieve_faces_encodings(server_ip_address, server_port)
+
         self.__encodings_database_encodings_only = [np.array(tuple_representation) for tuple_representation in self.__encodings_database.keys() ] # Getting faces encodings only from the database
 
         self.__identified_student_ids = []
@@ -92,5 +119,5 @@ class Attendance:
         cap.release()
         cv2.destroyAllWindows()
 
-Session = Attendance()
+Session = Attendance(server_ip_address='192.168.1.10', server_port=5000)
 Session.start_session(show_preview=True)
