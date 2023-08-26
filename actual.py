@@ -1,7 +1,6 @@
 import face_recognition
 import cv2
 import numpy as np
-import os
 import json
 import socket
 import ast
@@ -23,6 +22,8 @@ Student Face Encodings should be returned to this script in a dictionary format.
 class Attendance:
 
     def __init__(self, server_ip_address: str, server_port: int, scale_frame=0.5, face_location_model='hog', face_encoding_model = 'small'):
+
+        print('\nSession Started.....\n\nAttempting to recieve session data from the server..\n')
 
         def retrieve_faces_encodings(server_ip_address, server_port, chunksize=1024):
             '''Retrieves and retuns dictionary (key is face enoding and value is the student id) of faces encoding from the server'''
@@ -46,10 +47,10 @@ class Attendance:
                 if not chunk:
                     break
 
-            print("JSON data received:", encodings_data)
             sock.close()
-            data_base = {ast.literal_eval(key): val for key, val in encodings_data.items()}
-            return data_base
+            print("Session data received.")
+            face_encodings_json = {ast.literal_eval(key): val for key, val in encodings_data.items()}
+            return face_encodings_json
 
         self.__encodings_database = retrieve_faces_encodings(server_ip_address, server_port)
 
