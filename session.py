@@ -27,7 +27,7 @@ class Attendance:
 
         print('\nSession Started.....\n\nAttempting to recieve session data from the server..\n')
 
-        def retrieve_faces_encodings(server_ip_address: str, server_port: int, chunksize=1024):
+        def retrieve_faces_encodings(server_ip_address: str, server_port: int, chunksize=1_000_000):
             '''Retrieves and retuns dictionary (key is face enoding and value is the student id) of faces encoding from the server'''
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             server_address = (server_ip_address, server_port)  # the server's IP address and port
@@ -65,7 +65,7 @@ class Attendance:
         self.face_location_model = face_location_model #'cnn' has better accuracy but uses GPU, 'hog' is faster with less accuracy uses cpu
         self.face_encoding_model = face_encoding_model #'large' model has better accuracy but is slower, 'small' model is faster
 
-    def send_identified_ids_timestamps_to_server(self, json: dict, server_ip_address: str, server_port: int, chunksize=1024) -> None:
+    def send_identified_ids_timestamps_to_server(self, json: dict, server_ip_address: str, server_port: int, chunksize=1_000_000) -> None:
         '''Sends the given list of student ids to the server'''
         print(json)
 

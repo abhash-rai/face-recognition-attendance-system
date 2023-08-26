@@ -47,4 +47,4 @@ def send_json_encodings(chunksize,path):
         print('Done.')
 
 
-send_json_encodings(1_000_000,r"images")
+send_json_encodings(1_000_000,r"database\face_encodings")
