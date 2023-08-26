@@ -11,7 +11,7 @@ def make_student_entry_to_database(image_path: str, student_id: int, university:
         -> Adds face encoding to database/face_encodings directory
     '''
     students_df = pd.read_csv(students_csv_path)
-    students_df.loc[len(students_df)] = [student_id, university, first_name, middle_name, last_name, semester, course]
+    students_df.loc[len(students_df)] = [f'{student_id}-{university}', student_id, university, first_name, middle_name, last_name, semester, course]
     students_df.to_csv(students_csv_path, index=False)
 
     image = face_recognition.load_image_file(image_path)
