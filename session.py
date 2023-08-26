@@ -33,9 +33,13 @@ class Attendance:
             server_address = (server_ip_address, server_port)  # the server's IP address and port
             sock.connect(server_address)
 
+            # Receive the number of chunks
+            num_chunks_data = sock.recv(chunksize)
+            num_chunks = int(num_chunks_data.decode())
+
             # Receive JSON data
             json_data = b""
-            while True:
+            for _ in range(num_chunks):
                 chunk = sock.recv(chunksize)
                 if not chunk:
                     break
@@ -43,11 +47,6 @@ class Attendance:
 
             # Decode and load the received JSON data
             encodings_data = json.loads(json_data.decode())
-
-            while True:
-                chunk = sock.recv(chunksize)
-                if not chunk:
-                    break
 
             sock.close()
             print("Session data received.")
