@@ -4,6 +4,7 @@ import numpy as np
 import json
 import socket
 import ast
+import datetime
 
 
 '''
@@ -57,19 +58,20 @@ class Attendance:
         self.__encodings_database_encodings_only = [np.array(tuple_representation) for tuple_representation in self.__encodings_database.keys() ] # Getting faces encodings only from the database
 
         self.__identified_student_ids = []
+        self.__identified_student_ids_with_timestamp = {} # This data will be sent to the server for attendance
         self.scale_frame = scale_frame
 
         self.process_current_frame = True
         self.face_location_model = face_location_model #'cnn' has better accuracy but uses GPU, 'hog' is faster with less accuracy uses cpu
         self.face_encoding_model = face_encoding_model #'large' model has better accuracy but is slower, 'small' model is faster
 
-    def send_identified_ids_to_server(student_ids: list) -> None:
+    def send_identified_ids_to_server(self, student_ids: list) -> None:
         '''Sends the given list of student ids to the server'''
         pass
 
-    def image_array_to_face_encoding(image_numpy_arr: np.array) -> np.array:
-        '''Inputs numpy array representation of an image and returns the 122 dimentional (numpy) encoding of every faces in the picture in a list'''
-        return face_recognition.face_encodings(image_numpy_arr)
+    def get_current_time(self):
+        '''Gets the current timestamp, converts to string and returns it'''
+        return str(datetime.datetime.now().time())
     
     def start_session(self, show_preview=True, camera_index=0, desired_fps=15):
         cap = cv2.VideoCapture(camera_index)
@@ -94,8 +96,12 @@ class Attendance:
 
                 self.__identified_student_ids.append(identity)
 
-            print(self.__identified_student_ids)
-            self.send_identified_ids_to_server() # Call function to send identified student ids to the server for attendance
+                if identity != 'Unknown': # Add the studentid with timestamp only for known students in the database
+                    self.__identified_student_ids_with_timestamp[identity] = self.get_current_time()
+
+            print(self.__identified_student_ids_with_timestamp)
+
+            self.send_identified_ids_to_server(None) # Call function to send identified student ids to the server for attendance
 
             if show_preview == True: 
 
@@ -115,6 +121,7 @@ class Attendance:
                     break
 
             self.__identified_student_ids = [] #Reset the variable
+            self.__identified_student_ids_with_timestamp = {} #Reset the variable
 
         # Release the camera and close the window
         cap.release()
