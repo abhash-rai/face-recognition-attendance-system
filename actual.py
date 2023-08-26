@@ -43,8 +43,9 @@ class Attendance:
         '''Inputs numpy array representation of an image and returns the 122 dimentional (numpy) encoding of every faces in the picture in a list'''
         return face_recognition.face_encodings(image_numpy_arr)
     
-    def start_session(self, show_preview=True, camera_index=0):
+    def start_session(self, show_preview=True, camera_index=0, desired_fps=15):
         cap = cv2.VideoCapture(camera_index)
+        frame_delay = int(1000 / desired_fps)  # Delay in milliseconds between frames based on the desired FPS
         while True:
             ret, frame = cap.read()
 
@@ -82,7 +83,7 @@ class Attendance:
                 
                 cv2.imshow('Face Detection', frame) # Display the frame with face rectangles
                 
-                if cv2.waitKey(1) & 0xFF == ord('q'): # Break the loop if 'q' key is pressed
+                if cv2.waitKey(frame_delay) & 0xFF == ord('q'): # Break the loop if 'q' key is pressed
                     break
 
             self.__identified_student_ids = [] #Reset the variable
@@ -92,4 +93,4 @@ class Attendance:
         cv2.destroyAllWindows()
 
 Session = Attendance()
-Session.start_session(show_preview=False)
+Session.start_session(show_preview=True)
