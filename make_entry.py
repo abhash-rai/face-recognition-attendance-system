@@ -11,12 +11,15 @@ def make_student_entry_to_database(image_path: str, student_id: int, university:
         -> Adds face encoding to database/face_encodings directory
     '''
     students_df = pd.read_csv(students_csv_path)
-    students_df.loc[len(students_df)] = [f'{student_id}-{university}', student_id, university, first_name, middle_name, last_name, semester, course]
-    students_df.to_csv(students_csv_path, index=False)
+    if f'{student_id}-{university}' not in students_df['unique_identifier']: #add only is not entried before
+        students_df.loc[len(students_df)] = [f'{student_id}-{university}', student_id, university, first_name, middle_name, last_name, semester, course]
+        students_df.to_csv(students_csv_path, index=False)
 
-    image = face_recognition.load_image_file(image_path)
-    encoding = face_recognition.face_encodings(image, model = 'large')[0]
-    np.save(f'./database/face_encodings/{student_id}-{university}', encoding)
+        image = face_recognition.load_image_file(image_path)
+        encoding = face_recognition.face_encodings(image, model = 'large')[0]
+        np.save(f'./database/face_encodings/{student_id}-{university}', encoding)
+    else:
+        print('\nStudent already in the database!')
 
 make_student_entry_to_database(
     image_path = './pp.jpg',
