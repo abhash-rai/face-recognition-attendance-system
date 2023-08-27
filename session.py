@@ -69,18 +69,11 @@ class Attendance:
         '''Sends the given list of student ids to the server'''
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.connect((server_ip_address, server_port))
-        # server_socket.listen(1)
-        
-        # print(f"\nSender listening on port {server_port}")
-        # print('Waiting for a session request...')
         
         while True:
             client_socket, addr = server_socket.accept()
-            # print(f"\nSession connected from: {addr[0]}:{addr[1]}")
             
             encodings_json = json.dumps(student_id_time_dict).encode()
-
-            # print('Sending data...')
 
             total_bytes = len(encodings_json)
             num_chunks = (total_bytes + chunksize - 1) // chunksize
@@ -90,8 +83,6 @@ class Attendance:
             for i in range(0, total_bytes, chunksize):
                 chunk = encodings_json[i:i + chunksize]
                 client_socket.sendall(chunk)
-
-            # print('Face encodings data sent.\n')
             
             client_socket.close()
 
@@ -128,28 +119,10 @@ class Attendance:
                 if identity != 'Unknown': # Add the studentid with timestamp only for known students in the database
                     self.__identified_student_ids_with_timestamp[identity] = self.get_current_time()
 
-            # # self.send_identified_ids_timestamps_to_server(self.__identified_student_ids_with_timestamp, self.__server_ip_address, 5002) # Call function to send identified student ids to the server for attendance
-            # encodings_json = json.dumps(self.__identified_student_ids_with_timestamp).encode()
-
-            # total_bytes = len(encodings_json)
-            # num_chunks = (total_bytes + chunksize - 1) // chunksize
-
-            # client_socket.sendall(str(num_chunks).encode() + b'\n')
-
-            # for i in range(0, total_bytes, chunksize):
-            #     chunk = encodings_json[i:i + chunksize]
-            #     client_socket.sendall(chunk)
-
-            # # print('Face encodings data sent.\n')
-            # data_json = json.dumps(self.__identified_student_ids_with_timestamp).encode()
-            # client_socket.sendall(len(data_json).to_bytes(4, byteorder='big'))
-            # client_socket.sendall(data_json)
-            # send_dict_over_socket(sender_socket, self.__identified_student_ids_with_timestamp)
             if len(self.__identified_student_ids_with_timestamp) != 0:
                 print(self.__identified_student_ids_with_timestamp)
                 identified_data_json = json.dumps(self.__identified_student_ids_with_timestamp)
                 client_socket.send(identified_data_json.encode())
-            # client_socket.send(self.__identified_student_ids_with_timestamp.encode())
             
 
             if show_preview == True: 

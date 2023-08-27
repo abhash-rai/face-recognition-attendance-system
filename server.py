@@ -5,7 +5,6 @@ import socket
 import json
 import threading
 import os 
-import ast
 
 class Server:
 
@@ -60,32 +59,14 @@ class Server:
             self.__attendance_csv.loc[student] = [student.split('-')[0], date, np.nan, False]
         self.__attendance_csv.to_csv(self.__attendance_csv_path, index=True) # Saving the new data
 
-    # def recieve_identified_ids_timestamps(self, server_ip_address='localhost', server_port=5002, chunksize=1_000_000) -> dict:
-    #     '''Recieves json/dict and returns it'''
-    #     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #     server_address = (server_ip_address, server_port)  # the server's IP address and port
-    #     sock.connect(server_address)
+    def make_attendance(self, student_id_time_dict: dict) -> None:
+        '''Iterates over the given dict items and makes attendance'''
+        for unique_identifier, time in student_id_time_dict.items():
+            if self.__attendance_csv.loc[unique_identifier,'attendance'] == False:
+                self.__attendance_csv.loc[unique_identifier,'time'] = time
+                self.__attendance_csv.loc[unique_identifier,'attendance'] = True
+        self.__attendance_csv.to_csv(self.__attendance_csv_path, index=True) # Saving the new data
 
-    #     # Receive the number of chunks
-    #     num_chunks_data = sock.recv(chunksize)
-    #     num_chunks = int(num_chunks_data.decode())
-
-    #     # Receive JSON data
-    #     json_data = b""
-    #     for _ in range(num_chunks):
-    #         chunk = sock.recv(chunksize)
-    #         if not chunk:
-    #             break
-    #         json_data += chunk
-
-    #     # Decode and load the received JSON data
-    #     encodings_data = json.loads(json_data.decode())
-
-    #     sock.close()
-    #     print("Session data received.")
-    #     face_encodings_json = {ast.literal_eval(key): val for key, val in encodings_data.items()}
-    #     print(face_encodings_json)
-    #     return face_encodings_json
     def recieve_identified_ids_timestamps(self, server_ip_address='localhost', server_port=5002, chunksize=1_000_000) -> dict:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind((server_ip_address, server_port))
@@ -105,6 +86,7 @@ class Server:
                             break
                         received_dict = json.loads(data)
                         print("Received dictionary:", received_dict)
+                        self.make_attendance(received_dict)
                 except KeyboardInterrupt:
                     print("Keyboard interrupt detected. Closing the connection.")
                 finally:
@@ -116,16 +98,6 @@ class Server:
         finally:
             server_socket.close()
             print("Server closed.\n")
-
-
-    def make_attendance(self, student_id_time_dict: dict) -> None:
-        '''Iterates over the given dict items and makes attendance'''
-        for unique_identifier, time in student_id_time_dict.items():
-            if self.__attendance_csv.loc[unique_identifier,'attendance'] == False:
-                self.__attendance_csv.loc[unique_identifier,'time'] = time
-                self.__attendance_csv.loc[unique_identifier,'attendance'] = True
-        self.__attendance_csv.to_csv(self.__attendance_csv_path, index=True) # Saving the new data
-        print(self.__attendance_csv)
 
 
 def main():
@@ -151,7 +123,5 @@ def main():
     
     send_json_face_encodings_thread.join()
     recieve_student_identification.join()
-
-    # server.make_attendance({'23140736-BCU':'10am'})
 
 main()
