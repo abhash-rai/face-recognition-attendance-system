@@ -90,12 +90,23 @@ class Server:
                 
                 try:
                     while True:
-                        data = client_socket.recv(self.__identified_ids_timestamps_transfer_chunksize).decode()
-                        if not data:
-                            break
-                        received_dict = json.loads(data)
-                        print("Received dictionary:", received_dict)
-                        self.make_attendance(received_dict)
+                        num_chunks_data = client_socket.recv(self.__identified_ids_timestamps_transfer_chunksize)
+                        num_chunks = int(num_chunks_data.decode())
+
+                        # Receive JSON data
+                        json_data = b""
+                        for _ in range(num_chunks):
+                            chunk = client_socket.recv(self.__identified_ids_timestamps_transfer_chunksize)
+                            if not chunk:
+                                break
+                            json_data += chunk
+
+                        # Decode and load the received JSON data
+                        encodings_data = json.loads(json_data.decode())
+
+                        print("Received dictionary:", encodings_data)
+                        self.make_attendance(encodings_data)
+
                 except KeyboardInterrupt:
                     print("Keyboard interrupt detected. Closing the connection.")
                 finally:
@@ -133,4 +144,5 @@ def main(server_ip):
     send_json_face_encodings_thread.join()
     recieve_student_identification.join()
 
-main('localhost')
+if __name__ == '__main__':
+    main('localhost')

@@ -103,9 +103,21 @@ class Attendance:
                     self.__identified_student_ids_with_timestamp[identity] = self.get_current_time()
 
             if len(self.__identified_student_ids_with_timestamp) != 0:
+                
+                identified_data_json = json.dumps(self.__identified_student_ids_with_timestamp).encode()
+                
+                total_bytes = len(identified_data_json)
+                num_chunks = (total_bytes + self.__identified_ids_timestamps_transfer_chunksize - 1) // self.__identified_ids_timestamps_transfer_chunksize
+
+                client_socket.sendall(str(num_chunks).encode() + b'\n')
+
+                for i in range(0, total_bytes, self.__identified_ids_timestamps_transfer_chunksize):
+                    chunk = identified_data_json[i:i + self.__identified_ids_timestamps_transfer_chunksize]
+                    client_socket.sendall(chunk)
+
                 print(self.__identified_student_ids_with_timestamp)
-                identified_data_json = json.dumps(self.__identified_student_ids_with_timestamp)
-                client_socket.send(identified_data_json.encode())
+                
+                # client_socket.close()
             
 
             if show_preview == True: 
@@ -133,5 +145,6 @@ class Attendance:
         cap.release()
         cv2.destroyAllWindows()
 
-Session = Attendance(server_ip_address='localhost')
-Session.start_session(show_preview=True)
+if __name__ == '__main__':
+    session = Attendance(server_ip_address='localhost')
+    session.start_session(show_preview=True)
