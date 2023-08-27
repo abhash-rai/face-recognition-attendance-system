@@ -27,7 +27,7 @@ class Attendance:
 
         print('\nSession Started.....\n\nAttempting to recieve session data from the server..\n')
 
-        def retrieve_faces_encodings(server_ip_address: str, server_port: int, chunksize=1_000_000):
+        def retrieve_faces_encodings(server_ip_address: str, server_port: int, chunksize=100000) -> dict:
             '''Retrieves and retuns dictionary (key is face enoding and value is the student id) of faces encoding from the server'''
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             server_address = (server_ip_address, server_port)  # the server's IP address and port
@@ -65,15 +65,44 @@ class Attendance:
         self.face_location_model = face_location_model #'cnn' has better accuracy but uses GPU, 'hog' is faster with less accuracy uses cpu
         self.face_encoding_model = face_encoding_model #'large' model has better accuracy but is slower, 'small' model is faster
 
-    def send_identified_ids_timestamps_to_server(self, json: dict, server_ip_address: str, server_port: int, chunksize=1_000_000) -> None:
+    def send_identified_ids_timestamps_to_server(self, student_id_time_dict: dict, server_ip_address: str, server_port: int, chunksize=1_000_000) -> None:
         '''Sends the given list of student ids to the server'''
-        print(json)
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.connect((server_ip_address, server_port))
+        # server_socket.listen(1)
+        
+        # print(f"\nSender listening on port {server_port}")
+        # print('Waiting for a session request...')
+        
+        while True:
+            client_socket, addr = server_socket.accept()
+            # print(f"\nSession connected from: {addr[0]}:{addr[1]}")
+            
+            encodings_json = json.dumps(student_id_time_dict).encode()
+
+            # print('Sending data...')
+
+            total_bytes = len(encodings_json)
+            num_chunks = (total_bytes + chunksize - 1) // chunksize
+
+            client_socket.sendall(str(num_chunks).encode() + b'\n')
+
+            for i in range(0, total_bytes, chunksize):
+                chunk = encodings_json[i:i + chunksize]
+                client_socket.sendall(chunk)
+
+            # print('Face encodings data sent.\n')
+            
+            client_socket.close()
 
     def get_current_time(self):
         '''Gets the current timestamp, converts to string and returns it'''
         return str(datetime.datetime.now().time())
     
     def start_session(self, show_preview=True, camera_index=0, desired_fps=15):
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect(('localhost', 5002))
+
         cap = cv2.VideoCapture(camera_index)
         frame_delay = int(1000 / desired_fps)  # Delay in milliseconds between frames based on the desired FPS
         while True:
@@ -99,7 +128,29 @@ class Attendance:
                 if identity != 'Unknown': # Add the studentid with timestamp only for known students in the database
                     self.__identified_student_ids_with_timestamp[identity] = self.get_current_time()
 
-            self.send_identified_ids_timestamps_to_server(self.__identified_student_ids_with_timestamp, self.__server_ip_address, self.__server_port) # Call function to send identified student ids to the server for attendance
+            # # self.send_identified_ids_timestamps_to_server(self.__identified_student_ids_with_timestamp, self.__server_ip_address, 5002) # Call function to send identified student ids to the server for attendance
+            # encodings_json = json.dumps(self.__identified_student_ids_with_timestamp).encode()
+
+            # total_bytes = len(encodings_json)
+            # num_chunks = (total_bytes + chunksize - 1) // chunksize
+
+            # client_socket.sendall(str(num_chunks).encode() + b'\n')
+
+            # for i in range(0, total_bytes, chunksize):
+            #     chunk = encodings_json[i:i + chunksize]
+            #     client_socket.sendall(chunk)
+
+            # # print('Face encodings data sent.\n')
+            # data_json = json.dumps(self.__identified_student_ids_with_timestamp).encode()
+            # client_socket.sendall(len(data_json).to_bytes(4, byteorder='big'))
+            # client_socket.sendall(data_json)
+            # send_dict_over_socket(sender_socket, self.__identified_student_ids_with_timestamp)
+            if len(self.__identified_student_ids_with_timestamp) != 0:
+                print(self.__identified_student_ids_with_timestamp)
+                identified_data_json = json.dumps(self.__identified_student_ids_with_timestamp)
+                client_socket.send(identified_data_json.encode())
+            # client_socket.send(self.__identified_student_ids_with_timestamp.encode())
+            
 
             if show_preview == True: 
 
@@ -121,9 +172,10 @@ class Attendance:
             self.__identified_student_ids = [] #Reset the variable
             self.__identified_student_ids_with_timestamp = {} #Reset the variable
 
+        client_socket.close()
         # Release the camera and close the window
         cap.release()
         cv2.destroyAllWindows()
 
-Session = Attendance(server_ip_address='192.168.1.10', server_port=5000)
+Session = Attendance(server_ip_address='localhost', server_port=5001)
 Session.start_session(show_preview=True)
