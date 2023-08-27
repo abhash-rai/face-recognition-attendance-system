@@ -32,12 +32,12 @@ class Server:
         server_socket.bind((self.__server_ip_address, self.__face_encodings_transfer_port))
         server_socket.listen(1)
         
-        print(f"\nSender listening on port {self.__face_encodings_transfer_port}")
+        print(f"\n[STARTED] Face encodings sender listening on {self.__server_ip_address}:{self.__face_encodings_transfer_port}")
         print('Waiting for a session request...')
         
         while True:
             client_socket, addr = server_socket.accept()
-            print(f"\nSession connected from: {addr[0]}:{addr[1]}")
+            print(f"\n[CONNECTED] Face encodings reciever connected from: {addr[0]}:{addr[1]}")
             
             encodings_data = { str(tuple(np.load(self.__face_endocings_directory_path+encoded_face_id))):encoded_face_id.split('.')[0] for encoded_face_id in os.listdir(self.__face_endocings_directory_path) }
             encodings_json = json.dumps(encodings_data).encode()
@@ -53,7 +53,7 @@ class Server:
                 chunk = encodings_json[i:i + self.__face_encodings_transfer_chunksize]
                 client_socket.sendall(chunk)
 
-            print('Face encodings data sent.\n')
+            print('[SENT] Face encodings data sent.\n')
             
             client_socket.close()
 
@@ -81,12 +81,13 @@ class Server:
         server_socket.bind((self.__server_ip_address, self.__identified_ids_timestamps_transfer_port ))
         server_socket.listen(1)  # Listen for at most 1 connection
 
-        print(f"\nServer listening on {self.__server_ip_address}:{self.__identified_ids_timestamps_transfer_port}")
+        print(f"\n[STARTED] Attendace information listening on {self.__server_ip_address}:{self.__identified_ids_timestamps_transfer_port}")
 
         try:
             while True:
                 client_socket, client_address = server_socket.accept()
-                print(f"Connection from: {client_address}")
+                print(f"\n[CONNECTED] Attendace information sender connected from: {client_address[0]}:{client_address[1]}")
+                print('Recieving attendance information....')
                 
                 try:
                     while True:
@@ -104,11 +105,11 @@ class Server:
                         # Decode and load the received JSON data
                         encodings_data = json.loads(json_data.decode())
 
-                        print("Received dictionary:", encodings_data)
+                        print("[RECIEVED]", encodings_data)
                         self.make_attendance(encodings_data)
 
-                except KeyboardInterrupt:
-                    print("Keyboard interrupt detected. Closing the connection.")
+                except:
+                    print("Recieving Interupted. Closing the connection.")
                 finally:
                     client_socket.close()
                     print("Connection closed.")
@@ -118,7 +119,6 @@ class Server:
         finally:
             server_socket.close()
             print("Server closed.\n")
-
 
 def main(server_ip):
     server = Server(server_ip)
@@ -144,5 +144,19 @@ def main(server_ip):
     send_json_face_encodings_thread.join()
     recieve_student_identification.join()
 
+def get_ip_address():
+    # Create a socket object to get the local host name
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # Doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        ip_address = s.getsockname()[0]
+    except Exception:
+        ip_address = '127.0.0.1'
+    finally:
+        s.close()
+    return ip_address
+
 if __name__ == '__main__':
-    main('localhost')
+    device_ip_address =  get_ip_address()
+    main(device_ip_address)

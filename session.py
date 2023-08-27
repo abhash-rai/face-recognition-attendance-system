@@ -51,7 +51,7 @@ class Attendance:
             encodings_data = json.loads(json_data.decode())
 
             sock.close()
-            print("Session data received.")
+            print("Session data received.\n")
             face_encodings_json = {ast.literal_eval(key): val for key, val in encodings_data.items()}
             return face_encodings_json
 
@@ -63,7 +63,6 @@ class Attendance:
         self.__identified_student_ids_with_timestamp = {} # This data will be sent to the server for attendance
         self.scale_frame = scale_frame
 
-        self.process_current_frame = True
         self.face_location_model = face_location_model #'cnn' has better accuracy but uses GPU, 'hog' is faster with less accuracy uses cpu
         self.face_encoding_model = face_encoding_model #'large' model has better accuracy but is slower, 'small' model is faster
 
@@ -71,7 +70,7 @@ class Attendance:
         '''Gets the current timestamp, converts to string and returns it'''
         return str(datetime.datetime.now().time())
     
-    def start_session(self, show_preview=True, camera_index=0, desired_fps=15, send_port=5002):
+    def start_session(self, show_preview=True, camera_index=0, desired_fps=15):
 
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((self.__server_ip_address, self.__identified_ids_timestamps_transfer_port))
@@ -102,7 +101,7 @@ class Attendance:
                 if identity != 'Unknown': # Add the studentid with timestamp only for known students in the database
                     self.__identified_student_ids_with_timestamp[identity] = self.get_current_time()
 
-            if len(self.__identified_student_ids_with_timestamp) != 0:
+            if len(self.__identified_student_ids_with_timestamp) != 0: # Send data only if one or more person is detected
                 
                 identified_data_json = json.dumps(self.__identified_student_ids_with_timestamp).encode()
                 
@@ -115,9 +114,7 @@ class Attendance:
                     chunk = identified_data_json[i:i + self.__identified_ids_timestamps_transfer_chunksize]
                     client_socket.sendall(chunk)
 
-                print(self.__identified_student_ids_with_timestamp)
-                
-                # client_socket.close()
+                print(f'[SENT]', self.__identified_student_ids_with_timestamp)
             
 
             if show_preview == True: 
@@ -132,7 +129,7 @@ class Attendance:
                     cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
                     cv2.putText(frame, identity, (left, bottom + 20), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1)
                 
-                cv2.imshow('Face Detection', frame) # Display the frame with face rectangles
+                cv2.imshow('Students Identification', frame) # Display the frame with face rectangles
                 
                 if cv2.waitKey(frame_delay) & 0xFF == ord('q'): # Break the loop if 'q' key is pressed
                     break
@@ -140,11 +137,10 @@ class Attendance:
             self.__identified_student_ids = [] #Reset the variable
             self.__identified_student_ids_with_timestamp = {} #Reset the variable
 
-        client_socket.close()
-        # Release the camera and close the window
-        cap.release()
-        cv2.destroyAllWindows()
+        client_socket.close() # Close the socket
+        cap.release() # Release the camera
+        cv2.destroyAllWindows() # Close the window
 
 if __name__ == '__main__':
-    session = Attendance(server_ip_address='localhost')
+    session = Attendance(server_ip_address='192.168.1.64')
     session.start_session(show_preview=True)
