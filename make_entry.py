@@ -23,11 +23,11 @@ def make_student_entry_to_database(image_path: str, student_id: int, university:
 
 make_student_entry_to_database(
     image_path = './pp.jpg',
-    student_id = 23140750, 
-    university = 'BCU', 
-    first_name = 'Sudeep', 
+    student_id = 66, 
+    university = 'IUKL', 
+    first_name = 'Manoj', 
     middle_name = '', 
-    last_name = 'Fullel', 
-    semester = 3, 
-    course = 'Bsc (Hons) Computer and Data Science'
+    last_name = 'Shrestha', 
+    semester = 6, 
+    course = 'BCS (Hons)'
 )
