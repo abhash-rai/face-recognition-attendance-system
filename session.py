@@ -67,27 +67,6 @@ class Attendance:
         self.face_location_model = face_location_model #'cnn' has better accuracy but uses GPU, 'hog' is faster with less accuracy uses cpu
         self.face_encoding_model = face_encoding_model #'large' model has better accuracy but is slower, 'small' model is faster
 
-    # def send_identified_ids_timestamps_to_server(self, student_id_time_dict: dict, server_ip_address: str, server_port=5002, chunksize=1_000_000) -> None:
-    #     '''Sends the given list of student ids to the server'''
-    #     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #     server_socket.connect((server_ip_address, server_port))
-        
-    #     while True:
-    #         client_socket, addr = server_socket.accept()
-            
-    #         encodings_json = json.dumps(student_id_time_dict).encode()
-
-    #         total_bytes = len(encodings_json)
-    #         num_chunks = (total_bytes + chunksize - 1) // chunksize
-
-    #         client_socket.sendall(str(num_chunks).encode() + b'\n')
-
-    #         for i in range(0, total_bytes, chunksize):
-    #             chunk = encodings_json[i:i + chunksize]
-    #             client_socket.sendall(chunk)
-            
-    #         client_socket.close()
-
     def get_current_time(self):
         '''Gets the current timestamp, converts to string and returns it'''
         return str(datetime.datetime.now().time())
