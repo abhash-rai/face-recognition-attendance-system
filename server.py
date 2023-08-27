@@ -8,7 +8,14 @@ import os
 
 class Server:
 
-    def __init__(self):
+    def __init__(self, server_ip_address: str):
+        
+        self.__server_ip_address = server_ip_address
+        self.__face_encodings_transfer_port = 5001
+        self.__face_encodings_transfer_chunksize = 100000
+        self.__identified_ids_timestamps_transfer_port = 5002
+        self.__identified_ids_timestamps_transfer_chunksize = 1024
+        
 
         self.__students_csv_path = './database/students.csv'
         self.__students_csv = pd.read_csv(self.__students_csv_path)
@@ -17,13 +24,15 @@ class Server:
         self.__attendance_csv = pd.read_csv(self.__attendance_csv_path).set_index('unique_identifier')
     
         self.__face_endocings_directory_path = './database/face_encodings/'
+
+        
     
-    def send_json_face_encodings(self, server_ip_address='localhost', server_port=5001, chunksize=100000):
+    def send_json_face_encodings(self):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind((server_ip_address, server_port))
+        server_socket.bind((self.__server_ip_address, self.__face_encodings_transfer_port))
         server_socket.listen(1)
         
-        print(f"\nSender listening on port {server_port}")
+        print(f"\nSender listening on port {self.__face_encodings_transfer_port}")
         print('Waiting for a session request...')
         
         while True:
@@ -36,12 +45,12 @@ class Server:
             print('Sending data...')
 
             total_bytes = len(encodings_json)
-            num_chunks = (total_bytes + chunksize - 1) // chunksize
+            num_chunks = (total_bytes + self.__face_encodings_transfer_chunksize - 1) // self.__face_encodings_transfer_chunksize
 
             client_socket.sendall(str(num_chunks).encode() + b'\n')
 
-            for i in range(0, total_bytes, chunksize):
-                chunk = encodings_json[i:i + chunksize]
+            for i in range(0, total_bytes, self.__face_encodings_transfer_chunksize):
+                chunk = encodings_json[i:i + self.__face_encodings_transfer_chunksize]
                 client_socket.sendall(chunk)
 
             print('Face encodings data sent.\n')
@@ -67,12 +76,12 @@ class Server:
                 self.__attendance_csv.loc[unique_identifier,'attendance'] = True
         self.__attendance_csv.to_csv(self.__attendance_csv_path, index=True) # Saving the new data
 
-    def recieve_identified_ids_timestamps(self, server_ip_address='localhost', server_port=5002, chunksize=1_000_000) -> dict:
+    def recieve_identified_ids_timestamps(self) -> dict:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind((server_ip_address, server_port))
+        server_socket.bind((self.__server_ip_address, self.__identified_ids_timestamps_transfer_port ))
         server_socket.listen(1)  # Listen for at most 1 connection
 
-        print(f"Server listening on {server_ip_address}:{server_port}")
+        print(f"\nServer listening on {self.__server_ip_address}:{self.__identified_ids_timestamps_transfer_port}")
 
         try:
             while True:
@@ -81,7 +90,7 @@ class Server:
                 
                 try:
                     while True:
-                        data = client_socket.recv(1024).decode()
+                        data = client_socket.recv(self.__identified_ids_timestamps_transfer_chunksize).decode()
                         if not data:
                             break
                         received_dict = json.loads(data)
@@ -100,8 +109,8 @@ class Server:
             print("Server closed.\n")
 
 
-def main():
-    server = Server()
+def main(server_ip):
+    server = Server(server_ip)
 
     while True:
         init_attendence_status = input(f'\nDo you want to initialize attendance for today? (y/n): ')
@@ -115,8 +124,8 @@ def main():
         else:
             print(f'Enter a valid command - y/n')
 
-    send_json_face_encodings_thread = threading.Thread(target=server.send_json_face_encodings, args=('localhost', 5001, 1_000_000))
-    recieve_student_identification = threading.Thread(target=server.recieve_identified_ids_timestamps, args=('localhost', 5002, 1_000_000))
+    send_json_face_encodings_thread = threading.Thread(target=server.send_json_face_encodings, args=())
+    recieve_student_identification = threading.Thread(target=server.recieve_identified_ids_timestamps, args=())
 
     send_json_face_encodings_thread.start()
     recieve_student_identification.start()
@@ -124,4 +133,4 @@ def main():
     send_json_face_encodings_thread.join()
     recieve_student_identification.join()
 
-main()
+main('localhost')
