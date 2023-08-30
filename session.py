@@ -2,6 +2,7 @@ import face_recognition
 import cv2
 import datetime
 import requests
+
 '''
 During execution, this script obtains data from the server once, and constantly sends identified student ids to the 
 server for attendance (Logics like if particular student attendance is already made, making attendence for student 
@@ -61,7 +62,7 @@ class Attendance:
             number_of_faces_detected = len(face_encodings)
             if number_of_faces_detected != 0: # Send data only if one or more person is detected
                 time = self.get_current_time()
-                print(f'[FACE DETECTION] {number_of_faces_detected} faces detected.')
+                print(f'[FACE DETECTION] {number_of_faces_detected} faces detected at {time}.')
                 self.__student_encondings_time_dict = {str(tuple(face_encoding)): time for face_encoding in face_encodings} # This data will be sent to the server for attendance
                 self.send_encodings_data(self.__student_encondings_time_dict)
                 
