@@ -23,7 +23,7 @@ Student Face Encodings is returned to the server in a list of dictionaries.
 
 class Attendance:
 
-    def __init__(self, scale_frame=0.5, face_location_model='hog', face_encoding_model = 'small'):
+    def __init__(self, POST_URL: str, scale_frame=0.5, face_location_model='hog', face_encoding_model = 'small'):
 
         print('\n[START] Session Started.....\n')
         
@@ -32,7 +32,7 @@ class Attendance:
         self.face_location_model = face_location_model #'cnn' has better accuracy but uses GPU, 'hog' is faster with less accuracy uses cpu
         self.face_encoding_model = face_encoding_model #'large' model has better accuracy but is slower, 'small' model is faster
 
-        self.__POST_URL = "http://localhost:8000/recieve-face-encodings/"
+        self.__POST_URL = POST_URL
 
     def send_encodings_data(self, json):
         # Send a POST request with the dictionary
@@ -94,5 +94,5 @@ class Attendance:
         quit()
 
 if __name__ == '__main__':
-    session = Attendance()
+    session = Attendance(POST_URL="http://localhost:8000/recieve-face-encodings/")
     session.start_session(show_preview=True)
