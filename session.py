@@ -17,7 +17,6 @@ Student Face Encodings is returned to the server in a list of dictionaries.
             { <face2_encoding>: <timestamp2> },
             { <face3_encoding>: <timestamp3> }
         ]
-        For example: 23140736-BCU
 '''
 
 
