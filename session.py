@@ -4,14 +4,19 @@ import datetime
 import requests
 
 '''
-During execution, this script obtains data from the server once, and constantly sends identified student ids to the 
-server for attendance (Logics like if particular student attendance is already made, making attendence for student 
-whose attendce is not made for a particular day is done by the server).
+During execution, this script constantly sends face encodings of detected faces to the server for attendance 
+(Logics like if comparing the detected face encodings against face encodings stored in the databse, 
+if particular student attendance is already made, making attendence for student whose attendance is not made present
+for a particular day is done by the server).
 
-Student Face Encodings should be returned to this script in a dictionary format.
-    * Key should be tuple of 122 dimentional face encoding converted from its orignal form of numpy array to use it as dict key
-    * Value should be string of unique student identification in the following format:
-        <student_id>-<university>
+Student Face Encodings is returned to the server in a list of dictionaries.
+    * Key should be string of tuple of 122 dimentional face encoding converted from its orignal form of numpy array to use it as dict key
+    * Value should be string of the time at which particular face was detected; in the following format:
+        [
+            { <face1_encoding>: <timestamp1> },
+            { <face2_encoding>: <timestamp2> },
+            { <face3_encoding>: <timestamp3> }
+        ]
         For example: 23140736-BCU
 '''
 
