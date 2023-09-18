@@ -1,0 +1,9 @@
+{
+    "server": "localhost",
+    "username": "root",
+    "password": "alpha-is-here",
+    "database": "attendance_db",
+    "personnel_table_name": "personnel",
+    "attendance_table_name": "attendance",
+    "mysql_unknown_name_table": "unknown"
+}
