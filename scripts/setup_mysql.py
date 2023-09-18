@@ -1,7 +1,7 @@
 import json
 import mysql.connector
 
-def parse_config_file(path='./config.json'):
+def parse_config_file(path='../config.json'):
 
     with open(path, 'r') as config_file:
         config_data = json.load(config_file)
@@ -34,7 +34,7 @@ def connect_mysql_database(server: str, username: str, password : str) -> tuple 
         print("Couldn't connect to MySQL database server! Please check your credentials.")
         exit()
 
-server, username, password, database, personnel_table_name, attendance_table_name, mysql_unknown_name_table = parse_config_file(path='./config.json')
+server, username, password, database, personnel_table_name, attendance_table_name, mysql_unknown_name_table = parse_config_file(path='../config.json')
 
 connection, cursor = connect_mysql_database(server, username, password)
 

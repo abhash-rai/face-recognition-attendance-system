@@ -13,7 +13,7 @@ class Session:
         self.face_location_model = face_location_model #'cnn' has better accuracy but uses GPU, 'hog' is faster with less accuracy uses cpu
         self.face_encoding_model = face_encoding_model #'large' model has better accuracy but is slower, 'small' model is faster
 
-        self.__face_encodings_pkl_path = './database/known_face_encodings'
+        self.__face_encodings_pkl_path = '../database/known_face_encodings'
         with open(self.__face_encodings_pkl_path, 'rb') as file:
             self.__known_face_encodings = pickle.load(file)
 
@@ -160,7 +160,7 @@ class Session:
             
             person_count = entry_into_db()
                     
-            cv2.imwrite(f'./photos/unidentified_faces/{person_count}.jpg', frame)
+            cv2.imwrite(f'../photos/unidentified_faces/{person_count}.jpg', frame)
             
         else:
             if True not in face_recognition.api.compare_faces(self.__not_identified_face_encodings, encoding):
@@ -168,7 +168,7 @@ class Session:
                 
                 person_count = entry_into_db()
                     
-                cv2.imwrite(f'./photos/unidentified_faces/{person_count}.jpg', frame)
+                cv2.imwrite(f'../photos/unidentified_faces/{person_count}.jpg', frame)
 
 
     def compare_faces(self, known: dict, unknown, tolerance):
@@ -273,7 +273,7 @@ def main(server, username, password, database, personnel_table_name, attendance_
         tolerance=0.45
     )
 
-def parse_config_file(path='./config.json'):
+def parse_config_file(path='../config.json'):
 
     with open(path, 'r') as config_file:
         config_data = json.load(config_file)
@@ -291,6 +291,6 @@ def parse_config_file(path='./config.json'):
 
 if __name__ == "__main__":
 
-    server, username, password, database, personnel_table_name, attendance_table_name, mysql_unknown_name_table = parse_config_file(path='./config.json')
+    server, username, password, database, personnel_table_name, attendance_table_name, mysql_unknown_name_table = parse_config_file(path='../config.json')
 
     main(server, username, password, database, personnel_table_name, attendance_table_name, mysql_unknown_name_table)
