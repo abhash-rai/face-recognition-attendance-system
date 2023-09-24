@@ -1,9 +1,11 @@
 {
-    "server": "localhost",
-    "username": "root",
-    "password": "alpha-is-here",
-    "database": "attendance_db",
+    "server": "65.109.153.186",
+    "username": "sunwayst_Sudeep",
+    "password": "iamhello#123",
+    "database": "sunwayst_sudeepFullel_bcu",
     "personnel_table_name": "personnel",
     "attendance_table_name": "attendance",
     "mysql_unknown_name_table": "unknown"
 }
+
+
