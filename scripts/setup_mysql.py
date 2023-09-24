@@ -50,7 +50,7 @@ USE {database};
 
 # Creating attendance table
 cursor.execute(f'''
-CREATE TABLE {attendance_table_name} (
+CREATE TABLE IF NOT EXISTS {attendance_table_name} (
     student_id INT NOT NULL,
     university VARCHAR(255) NOT NULL,
     date DATE NULL,
@@ -62,7 +62,7 @@ CREATE TABLE {attendance_table_name} (
 
 # Creating personnel table
 cursor.execute(f'''
-CREATE TABLE {personnel_table_name} (
+CREATE TABLE IF NOT EXISTS {personnel_table_name} (
     student_id INT NOT NULL,
     university VARCHAR(255) NOT NULL,
     first_name VARCHAR(255) NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE {personnel_table_name} (
 ''')
 
 cursor.execute(f'''
-CREATE TABLE {mysql_unknown_name_table} (
+CREATE TABLE IF NOT EXISTS {mysql_unknown_name_table} (
     person_id INT NOT NULL,
     date DATE NULL,
     in_time TIME NULL
