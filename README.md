@@ -107,8 +107,8 @@ Before you begin, ensure that you meet the following requirements:
     session = Session(
         face_encodings_path = stored_face_encodings_path,
         unknwon_face_store_location = unknwon_face_store_location,
-        face_location_model='hog', #'cnn' has better accuracy but uses GPU, 'hog' is faster with less accuracy uses cpu
-        face_encoding_model = 'small', #'large' model has better accuracy but is slower, 'small' model is faster
+        face_location_model='hog', 
+        face_encoding_model = 'small', 
         time_between_entry_exit = 3
     )
     ``` 
