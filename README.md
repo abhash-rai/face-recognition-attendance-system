@@ -50,15 +50,15 @@ Before you begin, ensure that you meet the following requirements:
 
 <br>
 
-1. Configure the 'Config.json' file
+1. Configure the `Config.json` file
 
-    In the 'Config.json' file, replace only the first four placeholder values with your MySQL server IP, username, password, and database name.
+    In the `Config.json` file, replace only the first four placeholder values with your MySQL server IP, username, password, and database name.
 
 <br>
 
 2. Add face images
 
-    All the images to encode should be inside `to_encode_faces` folder on following format `(where each sub-folder of to_encode_faces is information regardng a person)`: 
+    All the images to encode should be inside `to_encode_faces` folder on following format (where each sub-folder of to_encode_faces is information regardng a person):
 
     ```
     to_encode/
